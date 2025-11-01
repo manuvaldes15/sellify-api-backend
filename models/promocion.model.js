@@ -58,9 +58,22 @@ const Promocion = {
     } finally {
       client.release(); // Libera la conexión
     }
-  }
+  },
   
-  // Próximamente: findActive (para que los clientes vean las promos)
+  findActive: async () => {
+    const query = `
+      SELECT id, id_negocio, nombre_negocio, nombre, descripcion, termina_en
+      FROM promociones
+      WHERE NOW() BETWEEN inicia_en AND termina_en
+      ORDER BY termina_en ASC;
+    `;
+    // Seleccionamos solo los campos que el cliente necesita ver
+    // y ordenamos por las que terminan más pronto.
+    
+    const result = await db.query(query);
+    return result.rows;
+  }
+
 };
 
 module.exports = Promocion;

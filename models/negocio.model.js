@@ -85,6 +85,51 @@ const Negocio = {
 
     // Devolver el negocio actualizado (de la primera consulta)
     return negocioActualizado;
+  },
+
+  // --- ¡AÑADE ESTA NUEVA FUNCIÓN! ---
+  /**
+   * (CLIENTE) Busca negocios cercanos a una coordenada GPS.
+   * Utiliza la fórmula de Haversine para el cálculo.
+   * @param {number} lat - Latitud del cliente.
+   * @param {number} lon - Longitud del cliente.
+   * @param {number} radiusInKm - Radio de búsqueda en kilómetros.
+   * @returns {Promise<Array>} Lista de negocios cercanos.
+   */
+  findNearby: async (lat, lon, radiusInKm = 5) => {
+    // Validar que la entrada sea numérica
+    const latNum = parseFloat(lat);
+    const lonNum = parseFloat(lon);
+    const radiusNum = parseFloat(radiusInKm);
+
+    if (isNaN(latNum) || isNaN(lonNum)) {
+      throw new Error('Latitud y longitud deben ser números válidos.');
+    }
+
+    // Esta consulta usa una sub-selección para calcular la distancia
+    // (en km) para cada negocio y luego la filtra por el radio.
+    const query = `
+      SELECT * FROM (
+        SELECT id_usuario, nombre_negocio, rubro, 
+               ubicacion_local_lat, ubicacion_local_lon,
+               ( 6371 * acos(
+                   cos( radians($1) )
+                   * cos( radians( ubicacion_local_lat ) )
+                   * cos( radians( ubicacion_local_lon ) - radians($2) )
+                   + sin( radians($1) )
+                   * sin( radians( ubicacion_local_lat ) )
+               ) ) AS distancia_km
+        FROM negocios
+        WHERE ubicacion_local_lat IS NOT NULL 
+          AND ubicacion_local_lon IS NOT NULL
+      ) AS negocios_con_distancia
+      WHERE distancia_km < $3
+      ORDER BY distancia_km;
+    `;
+    
+    const params = [latNum, lonNum, radiusNum];
+    const result = await db.query(query, params);
+    return result.rows;
   }
 
 };

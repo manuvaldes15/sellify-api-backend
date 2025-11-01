@@ -13,4 +13,11 @@ router.patch('/me/config',
   NegocioController.updateMyConfig
 );
 
+// --- ¡NUEVA RUTA! ---
+// Ruta para que un cliente descubra negocios cercanos
+router.get('/nearby',
+  verificarToken, // Solo requiere estar logueado
+  NegocioController.findNearbyBusinesses
+);
+
 module.exports = router;

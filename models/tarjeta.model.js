@@ -143,7 +143,34 @@ const Tarjeta = {
     
     const result = await db.query(updateQuery, [sellosRestantes, idTarjeta]);
     return result.rows[0];
+  },
+
+  /**
+   * Actualiza el estado de 'favorita' de una tarjeta de lealtad.
+   * @param {number} idTarjeta - El ID (PK) de la tabla 'tarjetas_lealtad'.
+   * @param {boolean} favorita - El nuevo estado (true o false).
+   * @param {number} idCliente - El ID del cliente (para seguridad).
+   * @returns {Promise<object>} La tarjeta actualizada.
+   */
+  updateFavoriteStatus: async (idTarjeta, favorita, idCliente) => {
+    const query = `
+      UPDATE tarjetas_lealtad
+      SET favorita = $1, actualizado_en = NOW()
+      WHERE id = $2 AND id_cliente = $3
+      RETURNING *;
+    `;
+    // El 'AND id_cliente' es la clave de seguridad.
+    // Evita que un cliente marque como favorita la tarjeta de otro.
+    const values = [favorita, idTarjeta, idCliente];
+    const result = await db.query(query, values);
+    
+    if (result.rows.length === 0) {
+      // Esto pasa si la tarjeta no existe O no le pertenece al usuario
+      throw new Error('Tarjeta no encontrada o no pertenece a este usuario.');
+    }
+    return result.rows[0];
   }
+
 };
 
 module.exports = Tarjeta;

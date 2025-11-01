@@ -108,7 +108,62 @@ const Usuario = {
     } finally {
       client.release();
     }
+  },
+
+  /**
+   * Actualiza el perfil (nombre) de un usuario.
+   * @param {number} idUsuario - ID del usuario (del token).
+   * @param {string} nombre - Nuevo nombre.
+   * @returns {Promise<object>} El usuario actualizado (sin la contraseña).
+   */
+  updateProfile: async (idUsuario, nombre) => {
+    const query = `
+      UPDATE usuarios
+      SET nombre = $1, actualizado_en = NOW()
+      WHERE id = $2
+      RETURNING id, nombre, correo, rol;
+    `;
+    
+    const result = await db.query(query, [nombre, idUsuario]);
+    
+    if (result.rows.length === 0) {
+      throw new Error('Usuario no encontrado.');
+    }
+    
+    return result.rows[0];
+  },
+
+
+  findById: async (id) => {
+    const query = 'SELECT * FROM usuarios WHERE id = $1';
+    const result = await db.query(query, [id]);
+    return result.rows[0];
+  },
+
+  /**
+   * Actualiza únicamente la contraseña de un usuario.
+   * @param {number} id - ID del usuario a actualizar.
+   * @param {string} hashContrasena - El nuevo hash de contraseña (ya encriptado).
+   * @returns {Promise<void>}
+   */
+
+  // --- ¡AÑADE ESTA SEGUNDA FUNCIÓN NUEVA! ---
+  /**
+   * Actualiza únicamente la contraseña de un usuario.
+   * @param {number} id - ID del usuario a actualizar.
+   * @param {string} hashContrasena - El nuevo hash de contraseña (ya encriptado).
+   * @returns {Promise<void>}
+   */
+  updatePassword: async (id, hashContrasena) => {
+    const query = `
+      UPDATE usuarios
+      SET hash_contrasena = $1, actualizado_en = NOW()
+      WHERE id = $2;
+    `;
+    await db.query(query, [hashContrasena, id]);
   }
+
+
 };
 
 module.exports = Usuario;

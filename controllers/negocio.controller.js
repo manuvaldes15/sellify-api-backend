@@ -31,6 +31,24 @@ const NegocioController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+
+  findNearbyBusinesses: async (req, res) => {
+    // Los datos vienen de la URL: /api/businesses/nearby?lat=13.7&lon=-89.2
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+      return res.status(400).json({ error: 'Se requieren los parámetros de consulta "lat" y "lon".' });
+    }
+
+    try {
+      // Usamos un radio de 5km por defecto
+      const negocios = await Negocio.findNearby(lat, lon, 5);
+      res.json(negocios);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
+    }
   }
 
 };

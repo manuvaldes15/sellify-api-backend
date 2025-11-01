@@ -90,6 +90,50 @@ const AuthController = {
       }
       res.status(500).json({ error: 'Error interno del servidor' });
     }
+  },
+
+  // --- ¡AÑADE ESTA NUEVA FUNCIÓN! ---
+  /**
+   * Permite a un usuario autenticado cambiar su contraseña.
+   */
+  changePassword: async (req, res) => {
+    try {
+      // 1. El ID del usuario viene del token verificado
+      const idUsuario = req.usuario.id;
+
+      // 2. Obtener contraseñas del body
+      const { contrasenaActual, nuevaContrasena } = req.body;
+
+      if (!contrasenaActual || !nuevaContrasena) {
+        return res.status(400).json({ error: 'Todos los campos son requeridos.' });
+      }
+
+      // 3. Buscar al usuario en la BD (necesitamos su hash actual)
+      const usuario = await Usuario.findById(idUsuario);
+      if (!usuario) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+
+      // 4. Comparar la contraseña "actual" con el hash de la BD
+      const contrasenaValida = bcrypt.compareSync(contrasenaActual, usuario.hash_contrasena);
+
+      if (!contrasenaValida) {
+        return res.status(401).json({ error: 'La contraseña actual es incorrecta.' }); // 401 Unauthorized
+      }
+
+      // 5. Si es válida, hashear la *nueva* contraseña
+      const salt = bcrypt.genSaltSync(10);
+      const nuevoHash = bcrypt.hashSync(nuevaContrasena, salt);
+
+      // 6. Guardar el nuevo hash en la BD
+      await Usuario.updatePassword(idUsuario, nuevoHash);
+
+      res.json({ mensaje: 'Contraseña actualizada exitosamente.' });
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
+    }
   }
 };
 

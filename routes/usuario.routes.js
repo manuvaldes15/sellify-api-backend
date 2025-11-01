@@ -13,4 +13,11 @@ router.patch('/me/request-business',
   UsuarioController.requestBusinessAccount
 );
 
+// --- ¡NUEVA RUTA! ---
+// Ruta para que un usuario actualice su perfil (nombre)
+router.patch('/me',
+  verificarToken, // Solo requiere estar logueado
+  UsuarioController.updateMyProfile
+);
+
 module.exports = router;

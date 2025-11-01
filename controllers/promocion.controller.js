@@ -41,6 +41,18 @@ const PromocionController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+
+  getActive: async (req, res) => {
+    try {
+      // Llama al modelo
+      const promociones = await Promocion.findActive();
+      // Devuelve la lista
+      res.json(promociones);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
   }
 
 };

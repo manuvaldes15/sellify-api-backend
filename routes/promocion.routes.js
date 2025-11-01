@@ -13,7 +13,12 @@ router.post('/',
   PromocionController.create
 );
 
-// Próximamente: una ruta GET pública para que los clientes vean las promos
-// router.get('/', PromocionController.getActive);
+router.get('/', PromocionController.getActive);// --- ¡NUEVA RUTA! ---
+// Ruta para que el CLIENTE vea las promociones activas
+// (Cualquier usuario logueado puede verlas)
+router.get('/',
+  verificarToken,
+  PromocionController.getActive
+);
 
-module.exports = router;
+module.exports = router
