@@ -130,6 +130,22 @@ const Negocio = {
     const params = [latNum, lonNum, radiusNum];
     const result = await db.query(query, params);
     return result.rows;
+  },
+
+  // --- ¡NUEVA FUNCIÓN! ---
+  /**
+   * (NEGOCIO) Busca los detalles de un negocio por su ID de usuario.
+   * @param {number} idNegocio - ID del negocio (del token).
+   * @returns {Promise<object>} Los detalles del negocio.
+   */
+  findById: async (idNegocio) => {
+    const query = 'SELECT * FROM negocios WHERE id_usuario = $1';
+    const result = await db.query(query, [idNegocio]);
+    
+    if (result.rows.length === 0) {
+      throw new Error('Perfil de negocio no encontrado.');
+    }
+    return result.rows[0];
   }
 
 };

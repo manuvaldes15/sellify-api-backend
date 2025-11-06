@@ -49,6 +49,22 @@ const NegocioController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+
+  // --- ¡NUEVA FUNCIÓN! ---
+  /**
+   * (GET) Obtiene los detalles del negocio autenticado.
+   */
+  getMyBusinessDetails: async (req, res) => {
+    try {
+      const idNegocio = req.usuario.id;
+      const negocio = await Negocio.findById(idNegocio);
+      res.json(negocio);
+    } catch (err) {
+      console.error(err);
+      // Si el modelo lanza el error "no encontrado", respondemos 404
+      res.status(404).json({ error: err.message });
+    }
   }
 
 };
