@@ -60,20 +60,25 @@ const Promocion = {
     }
   },
   
-  findActive: async () => {
+findActive: async () => {
     const query = `
-      SELECT id, id_negocio, nombre_negocio, nombre, descripcion, termina_en
-      FROM promociones
-      WHERE NOW() BETWEEN inicia_en AND termina_en
-      ORDER BY termina_en ASC;
+      SELECT 
+        p.id, 
+        p.id_negocio, 
+        p.nombre_negocio, 
+        p.nombre, 
+        p.descripcion, 
+        p.termina_en,
+        n.rubro -- <-- ¡EL DATO "REAL" QUE NECESITAMOS!
+      FROM promociones AS p
+      JOIN negocios AS n ON p.id_negocio = n.id_usuario
+      WHERE NOW() BETWEEN p.inicia_en AND p.termina_en
+      ORDER BY p.termina_en ASC;
     `;
-    // Seleccionamos solo los campos que el cliente necesita ver
-    // y ordenamos por las que terminan más pronto.
     
     const result = await db.query(query);
     return result.rows;
   }
-
 };
 
 module.exports = Promocion;
