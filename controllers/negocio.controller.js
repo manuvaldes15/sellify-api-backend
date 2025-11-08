@@ -67,6 +67,20 @@ const NegocioController = {
     }
   },
 
+
+  getMyPromotions: async (req, res) => {
+    try {
+      // El ID del negocio viene del token
+      const idNegocio = req.usuario.id;
+      // Llama al modelo de Promocion
+      const promociones = await Promocion.findByNegocioId(idNegocio);
+      res.json(promociones);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
   uploadCardImage: async (req, res) => {
     try {
       if (!req.file) {

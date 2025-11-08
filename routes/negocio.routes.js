@@ -28,6 +28,13 @@ module.exports = (uploadParser) => {
     verificarToken,
     NegocioController.findNearbyBusinesses
   );
+
+  // Ruta para VER mis promociones
+  router.get('/me/promotions',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getMyPromotions
+  );
   
   // (Aquí puedes añadir la ruta GET /me/promotions si la tienes)
 
