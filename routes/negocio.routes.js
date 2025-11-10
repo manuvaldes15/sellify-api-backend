@@ -47,6 +47,14 @@ module.exports = (uploadParser) => {
     NegocioController.uploadCardImage
   );
 
+  // --- ¡NUEVA RUTA! ---
+  // Ruta PÚBLICA (para clientes) para listar TODOS los negocios
+  router.get('/',
+    verificarToken, // Requiere login
+    NegocioController.getAllBusinesses
+  );
+
+
   // Devuelve el router configurado
   return router;
 };

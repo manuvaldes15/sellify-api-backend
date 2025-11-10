@@ -106,6 +106,16 @@ const NegocioController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+
+  getAllBusinesses: async (req, res) => {
+    try {
+      const negocios = await Negocio.findAllPublic();
+      res.json(negocios);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
   }
 
 };
