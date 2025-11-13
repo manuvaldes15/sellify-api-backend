@@ -60,7 +60,11 @@ const Promocion = {
     }
   },
   
-findActive: async () => {
+/**
+   * (CLIENTE) Busca todas las promociones activas.
+   * ¡VERSIÓN ACTUALIZADA CON JOIN!
+   */
+  findActive: async () => {
     const query = `
       SELECT 
         p.id, 
@@ -80,6 +84,9 @@ findActive: async () => {
     const result = await db.query(query);
     return result.rows;
   }
+
+
+
 };
 
 module.exports = Promocion;
