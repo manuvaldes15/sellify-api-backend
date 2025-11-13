@@ -69,7 +69,8 @@ findActive: async () => {
         p.nombre, 
         p.descripcion, 
         p.termina_en,
-        n.rubro -- <-- ¡EL DATO "REAL" QUE NECESITAMOS!
+        n.rubro,             -- <-- ¡LA CATEGORÍA REAL!
+        n.tarjeta_config     -- <-- ¡LA TARJETA DEL NEGOCIO!
       FROM promociones AS p
       JOIN negocios AS n ON p.id_negocio = n.id_usuario
       WHERE NOW() BETWEEN p.inicia_en AND p.termina_en
