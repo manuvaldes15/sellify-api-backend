@@ -5,20 +5,19 @@ const PromocionController = require('../controllers/promocion.controller');
 const verificarToken = require('../middleware/authMiddleware');
 const checkRole = require('../middleware/checkRole');
 
-// Definimos la ruta POST para /
-// Solo un 'negocio' logueado puede crear una promoción
+// Ruta para que el NEGOCIO cree promociones
 router.post('/',
   verificarToken,
   checkRole(['negocio']),
   PromocionController.create
 );
 
-router.get('/', PromocionController.getActive);// --- ¡NUEVA RUTA! ---
-// Ruta para que el CLIENTE vea las promociones activas
-// (Cualquier usuario logueado puede verlas)
+// --- ¡CORRECCIÓN! ---
+// Solo debe haber UNA definición para GET /
+// Esta es la correcta, ya que requiere un token
 router.get('/',
   verificarToken,
   PromocionController.getActive
 );
 
-module.exports = router
+module.exports = router;
