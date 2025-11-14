@@ -14,10 +14,8 @@ router.post('/',
 
 // --- ¡CORRECCIÓN! ---
 // Solo debe haber UNA definición para GET /
-// Esta es la correcta, ya que requiere un token
-router.get('/',
-  verificarToken,
-  PromocionController.getActive
-);
+// Ruta pública para obtener las promociones activas
+router.get('/', PromocionController.getActive);
+// (quedó solo la ruta pública; la ruta duplicada que requería token se eliminó)
 
 module.exports = router;

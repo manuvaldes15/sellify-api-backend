@@ -59,11 +59,7 @@ const Promocion = {
       client.release(); // Libera la conexión
     }
   },
-  
-/**
-   * (CLIENTE) Busca todas las promociones activas.
-   * ¡VERSIÓN ACTUALIZADA CON JOIN!
-   */
+
   findActive: async () => {
     const query = `
       SELECT 
