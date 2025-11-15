@@ -65,6 +65,57 @@ const NegocioController = {
       // Si el modelo lanza el error "no encontrado", respondemos 404
       res.status(404).json({ error: err.message });
     }
+  },
+
+
+  getMyPromotions: async (req, res) => {
+    try {
+      // El ID del negocio viene del token
+      const idNegocio = req.usuario.id;
+      // Llama al modelo de Promocion
+      const promociones = await Promocion.findByNegocioId(idNegocio);
+      res.json(promociones);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
+  uploadCardImage: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No se subió ningún archivo.' });
+      }
+
+      // 1. 'req.file.path' es la URL segura que Cloudinary te devuelve
+      const imageUrl = req.file.path;
+      const idNegocio = req.usuario.id;
+
+      // 2. Llama a tu modelo existente para guardar solo esta URL
+      const negocioActualizado = await Negocio.updateConfig(idNegocio, { 
+          imagen_fondo_url: imageUrl 
+      });
+
+      // 3. Devuelve la respuesta que Swift espera (UpdateConfigResponse)
+      res.json({
+        mensaje: 'Imagen subida y guardada.',
+        negocio: negocioActualizado
+      });
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
+    }
+  },
+
+  getAllBusinesses: async (req, res) => {
+    try {
+      const negocios = await Negocio.findAllPublic();
+      res.json(negocios);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
   }
 
 };

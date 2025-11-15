@@ -55,6 +55,21 @@ const PromocionController = {
     }
   }
 
+  ,
+
+  /**
+   * Obtiene las promociones activas (público).
+   */
+  getActive: async (req, res) => {
+    try {
+      const promos = await Promocion.findActive();
+      res.json(promos);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
+    }
+  }
+
 };
 
 module.exports = PromocionController;

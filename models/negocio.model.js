@@ -146,7 +146,30 @@ const Negocio = {
       throw new Error('Perfil de negocio no encontrado.');
     }
     return result.rows[0];
+  },
+
+  // --- ¡AÑADE ESTA NUEVA FUNCIÓN! ---
+  /**
+   * (CLIENTE) Busca todos los negocios públicos.
+   * @returns {Promise<Array>} Lista de todos los negocios.
+   */
+  findAllPublic: async () => {
+    const query = `
+      SELECT 
+        id_usuario, 
+        nombre_negocio, 
+        rubro, 
+        ubicacion_local_lat,
+        ubicacion_local_lon,
+        tarjeta_config 
+      FROM negocios;
+    `;
+    // Seleccionamos solo los campos públicos
+    const result = await db.query(query);
+    return result.rows;
   }
+
+  
 
 };
 
