@@ -1,5 +1,6 @@
 // controllers/negocio.controller.js
 const Negocio = require('../models/negocio.model');
+const Promocion = require('../models/promocion.model');
 
 const NegocioController = {
 
@@ -78,6 +79,37 @@ const NegocioController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
+  /**
+   * Obtiene la información de una promoción específica (propia).
+   * Ruta esperada: GET /me/promotions/:promotionId
+   */
+  getPromotionInfo: async (req, res) => {
+    try {
+      const idNegocio = req.usuario.id;
+      const promotionId = req.params.promotionId;
+
+      if (!promotionId) {
+        return res.status(400).json({ error: 'ID de promoción requerido.' });
+      }
+
+      const promocion = await Promocion.getInfoPromotion(promotionId);
+
+      if (!promocion) {
+        return res.status(404).json({ error: 'Promoción no encontrada.' });
+      }
+
+      // Verificar que la promoción pertenezca al negocio autenticado
+      if (String(promocion.id_negocio) !== String(idNegocio)) {
+        return res.status(403).json({ error: 'No autorizado para ver esta promoción.' });
+      }
+
+      res.json(promocion);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
   },
 

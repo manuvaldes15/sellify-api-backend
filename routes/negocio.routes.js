@@ -35,6 +35,13 @@ module.exports = (uploadParser) => {
     checkRole(['negocio']),
     NegocioController.getMyPromotions
   );
+
+  // Ruta para VER información de una promoción propia
+  router.get('/me/promotions/:promotionId',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getPromotionInfo
+  );
   
   // (Aquí puedes añadir la ruta GET /me/promotions si la tienes)
 
