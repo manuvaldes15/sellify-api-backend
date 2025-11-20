@@ -169,6 +169,31 @@ const Tarjeta = {
       throw new Error('Tarjeta no encontrada o no pertenece a este usuario.');
     }
     return result.rows[0];
+  },
+
+  /**
+   * Obtiene todos los clientes de un negocio (con al menos 1 sello).
+   * Devuelve: id_cliente, nombre, correo, cantidad_sellos, creado_en, actualizado_en
+   * @param {number} idNegocio - ID del negocio.
+   * @returns {Promise<Array>} Lista de clientes con sus datos y sellos.
+   */
+  findClientsByNegocioId: async (idNegocio) => {
+    const query = `
+      SELECT 
+        t.id_cliente,
+        u.nombre AS nombre_cliente,
+        u.correo AS correo_cliente,
+        t.cantidad_sellos,
+        t.creado_en AS cliente_desde,
+        t.actualizado_en AS ultima_actividad
+      FROM tarjetas_lealtad AS t
+      JOIN usuarios AS u ON t.id_cliente = u.id
+      WHERE t.id_negocio = $1 AND t.cantidad_sellos >= 1
+      ORDER BY t.cantidad_sellos DESC, t.actualizado_en DESC;
+    `;
+    
+    const result = await db.query(query, [idNegocio]);
+    return result.rows;
   }
 
 };

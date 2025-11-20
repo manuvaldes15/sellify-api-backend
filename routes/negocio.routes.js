@@ -61,6 +61,13 @@ module.exports = (uploadParser) => {
     NegocioController.getAllBusinesses
   );
 
+  // --- ¡NUEVA RUTA PARA VER CLIENTES DEL NEGOCIO! ---
+  // Ruta para que el NEGOCIO vea sus clientes con sellos
+  router.get('/me/clients',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getMyClients
+  );
 
   // Devuelve el router configurado
   return router;

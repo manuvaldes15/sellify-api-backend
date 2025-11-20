@@ -1,6 +1,7 @@
 // controllers/negocio.controller.js
 const Negocio = require('../models/negocio.model');
 const Promocion = require('../models/promocion.model');
+const Tarjeta = require('../models/tarjeta.model');
 
 const NegocioController = {
 
@@ -147,6 +148,21 @@ const NegocioController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
+  /**
+   * Obtiene la lista de clientes del negocio autenticado (con al menos 1 sello).
+   * Ruta: GET /api/businesses/me/clients
+   */
+  getMyClients: async (req, res) => {
+    try {
+      const idNegocio = req.usuario.id;
+      const clientes = await Tarjeta.findClientsByNegocioId(idNegocio);
+      res.json(clientes);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
   }
 
