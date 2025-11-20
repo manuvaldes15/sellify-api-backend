@@ -69,6 +69,13 @@ module.exports = (uploadParser) => {
     NegocioController.getMyClients
   );
 
+  // KPIs del negocio
+  router.get('/me/stats',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getMyStats
+  );
+
   // Devuelve el router configurado
   return router;
 };

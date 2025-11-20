@@ -217,6 +217,30 @@ const Tarjeta = {
 
     const result = await db.query(query, [idCliente]);
     return result.rows[0];
+  },
+
+  /**
+   * Obtiene KPIs para un negocio basado en las tarjetas emitidas.
+   * @param {number} idNegocio - ID del negocio autenticado.
+   * @returns {Promise<object>} KPIs de clientes activos, premios disponibles y sellos.
+   */
+  getBusinessStats: async (idNegocio) => {
+    const query = `
+      SELECT
+        COALESCE(SUM(CASE WHEN t.cantidad_sellos > 0 THEN 1 ELSE 0 END), 0) AS clientes_activos,
+        COALESCE(SUM(CASE
+          WHEN t.cache_sellos_requeridos > 0 AND t.cantidad_sellos >= t.cache_sellos_requeridos
+            THEN 1
+          ELSE 0
+        END), 0) AS clientes_listos_premio,
+        COALESCE(SUM(t.cantidad_sellos), 0) AS sellos_acumulados,
+        COALESCE(AVG(NULLIF(t.cantidad_sellos, 0)), 0) AS promedio_sellos_por_cliente
+      FROM tarjetas_lealtad AS t
+      WHERE t.id_negocio = $1;
+    `;
+
+    const result = await db.query(query, [idNegocio]);
+    return result.rows[0];
   }
 
 };

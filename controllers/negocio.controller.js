@@ -164,6 +164,28 @@ const NegocioController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+
+  /**
+   * KPIs del negocio sobre sus clientes y sellos.
+   */
+  getMyStats: async (req, res) => {
+    try {
+      const idNegocio = req.usuario.id;
+      const stats = await Tarjeta.getBusinessStats(idNegocio);
+
+      const response = {
+        clientesActivos: Number(stats?.clientes_activos) || 0,
+        clientesListosParaPremio: Number(stats?.clientes_listos_premio) || 0,
+        sellosAcumulados: Number(stats?.sellos_acumulados) || 0,
+        promedioSellosPorCliente: Number(stats?.promedio_sellos_por_cliente) || 0
+      };
+
+      res.json(response);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
+    }
   }
 
 };
