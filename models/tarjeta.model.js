@@ -194,6 +194,29 @@ const Tarjeta = {
     
     const result = await db.query(query, [idNegocio]);
     return result.rows;
+  },
+
+  /**
+   * Obtiene métricas agregadas de la billetera del cliente.
+   * @param {number} idCliente - ID del cliente autenticado.
+   * @returns {Promise<object>} KPIs con totals de sellos, negocios y premios disponibles.
+   */
+  getClientStats: async (idCliente) => {
+    const query = `
+      SELECT
+        COALESCE(SUM(t.cantidad_sellos), 0) AS total_sellos_actuales,
+        COUNT(*) AS negocios_asociados,
+        COALESCE(SUM(CASE
+          WHEN t.cache_sellos_requeridos > 0
+            THEN t.cantidad_sellos / t.cache_sellos_requeridos
+          ELSE 0
+        END), 0) AS premios_disponibles
+      FROM tarjetas_lealtad AS t
+      WHERE t.id_cliente = $1;
+    `;
+
+    const result = await db.query(query, [idCliente]);
+    return result.rows[0];
   }
 
 };

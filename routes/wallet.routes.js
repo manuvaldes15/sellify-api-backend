@@ -10,6 +10,7 @@ const verificarToken = require('../middleware/authMiddleware'); // Importa el gu
 // 2. Se ejecuta 'verificarToken' (el guardia)
 // 3. Si el token es válido, se ejecuta 'WalletController.getMiBilletera'
 router.get('/me', verificarToken, WalletController.getMiBilletera);
+router.get('/me/stats', verificarToken, WalletController.getMyStats);
 
 router.patch('/cards/:id', verificarToken, WalletController.toggleFavorite);
 

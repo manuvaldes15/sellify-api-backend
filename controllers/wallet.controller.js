@@ -25,6 +25,27 @@ const WalletController = {
     }
   },
 
+  /**
+   * Devuelve KPIs de la billetera del cliente autenticado.
+   */
+  getMyStats: async (req, res) => {
+    try {
+      const idCliente = req.usuario.id;
+      const stats = await Tarjeta.getClientStats(idCliente);
+
+      const response = {
+        totalSellosActuales: Number(stats?.total_sellos_actuales) || 0,
+        negociosAsociados: Number(stats?.negocios_asociados) || 0,
+        premiosDisponibles: Number(stats?.premios_disponibles) || 0
+      };
+
+      res.json(response);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
   
   toggleFavorite: async (req, res) => {
     try {
