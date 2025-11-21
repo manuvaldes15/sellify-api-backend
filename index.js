@@ -43,9 +43,20 @@ const promocionRoutes = require('./routes/promocion.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  "http://localhost:5173"
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173', // frontend origin
-  credentials: true               // permite enviar cookies/autenticación
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // permite requests tipo curl/postman
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }));
 app.use(express.json());
 
