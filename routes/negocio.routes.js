@@ -35,6 +35,13 @@ module.exports = (uploadParser) => {
     checkRole(['negocio']),
     NegocioController.getMyPromotions
   );
+
+  // Ruta para VER información de una promoción propia
+  router.get('/me/promotions/:promotionId',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getPromotionInfo
+  );
   
   // (Aquí puedes añadir la ruta GET /me/promotions si la tienes)
 
@@ -54,6 +61,27 @@ module.exports = (uploadParser) => {
     NegocioController.getAllBusinesses
   );
 
+  // --- ¡NUEVA RUTA PARA VER CLIENTES DEL NEGOCIO! ---
+  // Ruta para que el NEGOCIO vea sus clientes con sellos
+  router.get('/me/clients',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getMyClients
+  );
+
+  // KPIs del negocio
+  router.get('/me/stats',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.getMyStats
+  );
+
+  //Verifica el codigo de acceso
+  router.get('/me/code-verify',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.verifyAccessCode
+  );
 
   // Devuelve el router configurado
   return router;

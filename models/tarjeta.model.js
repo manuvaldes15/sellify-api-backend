@@ -169,6 +169,78 @@ const Tarjeta = {
       throw new Error('Tarjeta no encontrada o no pertenece a este usuario.');
     }
     return result.rows[0];
+  },
+
+  /**
+   * Obtiene todos los clientes de un negocio (con al menos 1 sello).
+   * Devuelve: id_cliente, nombre, correo, cantidad_sellos, creado_en, actualizado_en
+   * @param {number} idNegocio - ID del negocio.
+   * @returns {Promise<Array>} Lista de clientes con sus datos y sellos.
+   */
+  findClientsByNegocioId: async (idNegocio) => {
+    const query = `
+      SELECT 
+        t.id_cliente,
+        u.nombre AS nombre_cliente,
+        u.correo AS correo_cliente,
+        t.cantidad_sellos,
+        t.creado_en AS cliente_desde,
+        t.actualizado_en AS ultima_actividad
+      FROM tarjetas_lealtad AS t
+      JOIN usuarios AS u ON t.id_cliente = u.id
+      WHERE t.id_negocio = $1 AND t.cantidad_sellos >= 1
+      ORDER BY t.cantidad_sellos DESC, t.actualizado_en DESC;
+    `;
+    
+    const result = await db.query(query, [idNegocio]);
+    return result.rows;
+  },
+
+  /**
+   * Obtiene métricas agregadas de la billetera del cliente.
+   * @param {number} idCliente - ID del cliente autenticado.
+   * @returns {Promise<object>} KPIs con totals de sellos, negocios y premios disponibles.
+   */
+  getClientStats: async (idCliente) => {
+    const query = `
+      SELECT
+        COALESCE(SUM(t.cantidad_sellos), 0) AS total_sellos_actuales,
+        COUNT(*) AS negocios_asociados,
+        COALESCE(SUM(CASE
+          WHEN t.cache_sellos_requeridos > 0
+            THEN t.cantidad_sellos / t.cache_sellos_requeridos
+          ELSE 0
+        END), 0) AS premios_disponibles
+      FROM tarjetas_lealtad AS t
+      WHERE t.id_cliente = $1;
+    `;
+
+    const result = await db.query(query, [idCliente]);
+    return result.rows[0];
+  },
+
+  /**
+   * Obtiene KPIs para un negocio basado en las tarjetas emitidas.
+   * @param {number} idNegocio - ID del negocio autenticado.
+   * @returns {Promise<object>} KPIs de clientes activos, premios disponibles y sellos.
+   */
+  getBusinessStats: async (idNegocio) => {
+    const query = `
+      SELECT
+        COALESCE(SUM(CASE WHEN t.cantidad_sellos > 0 THEN 1 ELSE 0 END), 0) AS clientes_activos,
+        COALESCE(SUM(CASE
+          WHEN t.cache_sellos_requeridos > 0 AND t.cantidad_sellos >= t.cache_sellos_requeridos
+            THEN 1
+          ELSE 0
+        END), 0) AS clientes_listos_premio,
+        COALESCE(SUM(t.cantidad_sellos), 0) AS sellos_acumulados,
+        COALESCE(AVG(NULLIF(t.cantidad_sellos, 0)), 0) AS promedio_sellos_por_cliente
+      FROM tarjetas_lealtad AS t
+      WHERE t.id_negocio = $1;
+    `;
+
+    const result = await db.query(query, [idNegocio]);
+    return result.rows[0];
   }
 
 };

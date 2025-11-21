@@ -44,9 +44,20 @@ const reporteRoutes = require('./routes/reporte.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  "http://localhost:5173"
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173', // frontend origin
-  credentials: true               // permite enviar cookies/autenticación
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // permite requests tipo curl/postman
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }));
 app.use(express.json());
 
@@ -57,8 +68,8 @@ app.use('/api/stamps', stampRoutes);
 app.use('/api/businesses', negocioRoutes); 
 app.use('/api/users', usuarioRoutes); 
 app.use('/api/admin', adminRoutes); 
-app.use('/api/promotions', promocionRoutes); 
-app.use('/api/reportes', reporteRoutes);
+app.use('/api/promotions', promocionRoutes);
+app.use('/api/reportes', reporteRoutes); 
 
 app.listen(PORT, () => {
   console.log(`Servidor API de Sellify corriendo en http://localhost:${PORT}`);

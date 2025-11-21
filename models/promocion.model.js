@@ -82,6 +82,61 @@ const Promocion = {
   }
 
 
+  ,
+
+  /**
+   * Busca promociones por id de negocio.
+   * @param {number} idNegocio
+   * @returns {Promise<Array>} Lista de promociones del negocio
+   */
+  findByNegocioId: async (idNegocio) => {
+    const query = `
+      SELECT
+        id,
+        id_negocio,
+        nombre_negocio,
+        nombre,
+        descripcion,
+        inicia_en,
+        termina_en
+      FROM promociones
+      WHERE id_negocio = $1
+      ORDER BY inicia_en DESC;
+    `;
+
+    const result = await db.query(query, [idNegocio]);
+    return result.rows;
+  }
+
+
+  ,
+
+  /**
+   * Obtiene la información de una promoción por su id.
+   * @param {number|string} idPromocion
+   * @returns {Promise<object|null>} La promoción o null si no existe
+   */
+  getInfoPromotion: async (idPromocion) => {
+    const query = `
+      SELECT
+        id,
+        id_negocio,
+        nombre_negocio,
+        nombre,
+        descripcion,
+        inicia_en,
+        termina_en
+      FROM promociones
+      WHERE id = $1
+      LIMIT 1;
+    `;
+
+    const result = await db.query(query, [idPromocion]);
+    if (result.rows.length === 0) return null;
+    return result.rows[0];
+  }
+
+
 
 };
 

@@ -23,4 +23,32 @@ router.patch('/approve/:id',
   AdminController.approveRequest
 );
 
+// Ruta para OBTENER todos los usuarios
+router.get('/users',
+  verificarToken,
+  esAdmin,
+  AdminController.getAllUsers
+);
+
+// Ruta para CAMBIAR el rol de un usuario a admin
+router.patch('/change-role/:id/:rol',
+  verificarToken,
+  esAdmin,
+  AdminController.changeRoleToAdmin
+);
+
+// Ruta para GENERAR código de acceso para un usuario
+router.post('/generar-codigo/:id',
+  verificarToken,
+  esAdmin,
+  AdminController.saveAccessCode
+);
+
+// Ruta para ACTUALIZAR códigos de acceso de todos los usuarios
+router.patch('/actualizar-codigos-todos',
+  verificarToken,
+  esAdmin,
+  AdminController.updateAllAccessCodes
+);
+
 module.exports = router;
