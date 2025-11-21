@@ -105,7 +105,20 @@ const AdminController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
-  }
+  },
+
+  /**
+   * Obtiene todos los negocios y codigos.
+   */
+  getAllBusinesses: async (req, res) => {
+    try {
+      const negocios = await Negocio.findAllBusinesses();
+      res.json(negocios);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
 
 };
 

@@ -232,6 +232,15 @@ const Negocio = {
     }
     const storedCode = result.rows[0].codigo_acceso;
     return storedCode === code;
+  },
+
+  /**
+   * Encuentra todos los negocios con campos específicos.
+   */
+  findAllBusinesses: async () => {
+    const query = 'SELECT id_usuario, nombre_negocio, rubro, codigo_acceso FROM negocios';
+    const result = await db.query(query);
+    return result.rows;
   }
 
 };

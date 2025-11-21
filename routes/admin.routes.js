@@ -51,4 +51,11 @@ router.patch('/actualizar-codigos-todos',
   AdminController.updateAllAccessCodes
 );
 
+// Ruta para listar todos los negocios con codigo acceso
+router.get('/listar-negocios',
+  verificarToken,
+  esAdmin,
+  AdminController.getAllBusinesses
+);
+
 module.exports = router;
