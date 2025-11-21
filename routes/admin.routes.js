@@ -23,4 +23,18 @@ router.patch('/approve/:id',
   AdminController.approveRequest
 );
 
+// Ruta para OBTENER todos los usuarios
+router.get('/users',
+  verificarToken,
+  esAdmin,
+  AdminController.getAllUsers
+);
+
+// Ruta para CAMBIAR el rol de un usuario a admin
+router.patch('/change-role/:id/:rol',
+  verificarToken,
+  esAdmin,
+  AdminController.changeRoleToAdmin
+);
+
 module.exports = router;

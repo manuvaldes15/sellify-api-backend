@@ -22,8 +22,8 @@ const AdminController = {
   approveRequest: async (req, res) => {
     try {
       // El ID del usuario a aprobar viene de la URL (ej. /api/admin/approve/5)
-      const { id } = req.params; 
-      
+      const { id } = req.params;
+
       const usuarioAprobado = await Usuario.approveBusinessRequest(id);
 
       res.json({
@@ -31,6 +31,36 @@ const AdminController = {
         usuario: usuarioAprobado
       });
 
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
+    }
+  },
+
+  /**
+   * Obtiene todos los usuarios.
+   */
+  getAllUsers: async (req, res) => {
+    try {
+      const usuarios = await Usuario.findAll();
+      res.json(usuarios);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  },
+
+  /**
+   * Cambia el rol de un usuario a "admin".
+   */
+  changeRoleToAdmin: async (req, res) => {
+    try {
+      const { id, rol } = req.params;
+      const usuarioActualizado = await Usuario.updateRole(id, rol);
+      res.json({
+        mensaje: 'Rol del usuario cambiado exitosamente.',
+        usuario: usuarioActualizado
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });

@@ -161,6 +161,27 @@ const Usuario = {
       WHERE id = $2;
     `;
     await db.query(query, [hashContrasena, id]);
+  },
+
+  /**
+   * Obtiene todos los usuarios.
+   */
+  findAll: async () => {
+    const query = 'SELECT id, nombre, correo, rol, creado_en FROM usuarios ORDER BY creado_en DESC';
+    const result = await db.query(query);
+    return result.rows;
+  },
+
+  /**
+   * Actualiza el rol de un usuario.
+   */
+  updateRole: async (id, newRole) => {
+    const query = 'UPDATE usuarios SET rol = $1, actualizado_en = NOW() WHERE id = $2 RETURNING id, nombre, correo, rol';
+    const result = await db.query(query, [newRole, id]);
+    if (result.rows.length === 0) {
+      throw new Error('Usuario no encontrado');
+    }
+    return result.rows[0];
   }
 
 
