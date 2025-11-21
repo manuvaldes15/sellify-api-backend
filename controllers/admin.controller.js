@@ -65,6 +65,68 @@ const AdminController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+ /**
+   * Genera un código de acceso de 5 caracteres mezclando letras y números.
+   */
+  generateAccessCode: () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  },
+
+  /**
+   * Guarda el código de acceso para un usuario.
+   * El id se obtiene del token (req.user.id).
+   */
+  saveAccessCode: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const code = AdminController.generateAccessCode();
+
+      const query = `
+        UPDATE usuarios 
+        SET codigo_acceso = $1, actualizado_en = NOW() 
+        WHERE id = $2 
+        RETURNING id, nombre, correo, rol, codigo_acceso
+      `;
+      const result = await db.query(query, [code, id]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      }
+
+      // Devuelve la fila como JSON
+      return res.json({ success: true, usuario: result.rows[0] });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Error al guardar el código de acceso' });
+    }
+  },
+
+  /**
+   * Actualiza códigos de acceso para todos los usuarios.
+   */
+  updateAllAccessCodes: async (req, res) => {
+    try {
+      const usuarios = await Usuario.findAll();
+
+      for (const usuario of usuarios) {
+        const newCode = AdminController.generateAccessCode();
+        await db.query(
+          'UPDATE usuarios SET codigo_acceso = $1, actualizado_en = NOW() WHERE id = $2',
+          [newCode, usuario.id]
+        );
+      }
+
+      return res.json({ success: true, message: 'Códigos de acceso actualizados correctamente' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Error al actualizar los códigos de acceso' });
+    }
   }
 
 };

@@ -186,6 +186,33 @@ const NegocioController = {
       console.error(err);
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
+  },
+  /**
+   * Verifica si el código de acceso coincide con el del usuario.
+   */
+  verifyAccessCode: async (req, res) => {
+    try {
+      const { id } = req.usuario.id; // id desde el token
+      const { code } = req.body; // código enviado por el cliente
+
+      const query = 'SELECT codigo_acceso FROM usuarios WHERE id = $1';
+      const result = await db.query(query, [id]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      }
+
+      const storedCode = result.rows[0].codigo_acceso;
+
+      if (storedCode === code) {
+        return res.json({ success: true, message: 'Código verificado correctamente' });
+      } else {
+        return res.status(400).json({ success: false, message: 'Código incorrecto' });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Error al verificar el código de acceso' });
+    }
   }
 
 };

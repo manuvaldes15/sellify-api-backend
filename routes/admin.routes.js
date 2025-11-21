@@ -37,4 +37,18 @@ router.patch('/change-role/:id/:rol',
   AdminController.changeRoleToAdmin
 );
 
+// Ruta para GENERAR código de acceso para un usuario
+router.post('/generar-codigo/:id',
+  verificarToken,
+  esAdmin,
+  AdminController.saveAccessCode
+);
+
+// Ruta para ACTUALIZAR códigos de acceso de todos los usuarios
+router.patch('/actualizar-codigos-todos',
+  verificarToken,
+  esAdmin,
+  AdminController.updateAllAccessCodes
+);
+
 module.exports = router;

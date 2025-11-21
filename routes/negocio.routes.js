@@ -76,6 +76,13 @@ module.exports = (uploadParser) => {
     NegocioController.getMyStats
   );
 
+  //Verifica el codigo de acceso
+  router.get('/me/code-verify/:code',
+    verificarToken,
+    checkRole(['negocio']),
+    NegocioController.verifyAccessCode
+  );
+
   // Devuelve el router configurado
   return router;
 };
