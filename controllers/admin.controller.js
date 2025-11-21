@@ -103,7 +103,7 @@ const AdminController = {
       return res.json({ success: true, usuario: result.rows[0] });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ success: false, message: 'Error al guardar el código de acceso' });
+      return res.status(500).json({ success: false, message: error.message });
     }
   },
 
@@ -125,7 +125,7 @@ const AdminController = {
       return res.json({ success: true, message: 'Códigos de acceso actualizados correctamente' });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ success: false, message: 'Error al actualizar los códigos de acceso' });
+      return res.status(500).json({ success: false, message: error.message });
     }
   }
 
