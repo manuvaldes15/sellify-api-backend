@@ -1,5 +1,6 @@
 // controllers/admin.controller.js
 const Usuario = require('../models/usuario.model');
+const Negocio = require('../models/negocio.model');
 
 const AdminController = {
 
@@ -66,17 +67,7 @@ const AdminController = {
       res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
   },
- /**
-   * Genera un código de acceso de 5 caracteres mezclando letras y números.
-   */
-  generateAccessCode: () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let code = '';
-    for (let i = 0; i < 5; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-  },
+
 
   /**
    * Guarda el código de acceso para un usuario.
@@ -85,22 +76,15 @@ const AdminController = {
   saveAccessCode: async (req, res) => {
     try {
       const { id } = req.params;
-      const code = AdminController.generateAccessCode();
 
-      const query = `
-        UPDATE negocios 
-        SET codigo_acceso = $1, actualizado_en = NOW() 
-        WHERE id = $2 
-        RETURNING id_usuario, nombre_negocio, rubro, codigo_acceso
-      `;
-      const result = await db.query(query, [code, id]);
+      const result = await Negocio.saveAccessCode(id);
 
       if (result.rows.length === 0) {
         return res.status(404).json({ success: false, message: 'Negocio no encontrado' });
       }
 
       // Devuelve la fila como JSON
-      return res.json({ success: true, usuario: result.rows[0] });
+      return res.json({ success: true, negocio: result.rows[0] });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ success: false, message: error.message });
@@ -108,24 +92,18 @@ const AdminController = {
   },
 
   /**
-   * Actualiza códigos de acceso para todos los usuarios.
+   * Actualiza códigos de acceso para todos los negocios.
    */
   updateAllAccessCodes: async (req, res) => {
     try {
-      const usuarios = await Usuario.findAll();
-
-      for (const usuario of usuarios) {
-        const newCode = AdminController.generateAccessCode();
-        await db.query(
-          'UPDATE negocios SET codigo_acceso = $1, actualizado_en = NOW() WHERE id = $2',
-          [newCode, usuario.id]
-        );
-      }
-
-      return res.json({ success: true, message: 'Códigos de acceso actualizados correctamente' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ success: false, message: error.message });
+      const result = await Negocio.updateAllAccessCodes();
+      res.json({
+        mensaje: 'Códigos de acceso actualizados exitosamente.',
+        result: result
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error interno del servidor', detalles: err.message });
     }
   }
 

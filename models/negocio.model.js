@@ -155,21 +155,68 @@ const Negocio = {
    */
   findAllPublic: async () => {
     const query = `
-      SELECT 
-        id_usuario, 
-        nombre_negocio, 
-        rubro, 
+      SELECT
+        id_usuario,
+        nombre_negocio,
+        rubro,
         ubicacion_local_lat,
         ubicacion_local_lon,
-        tarjeta_config 
+        tarjeta_config
       FROM negocios;
     `;
     // Seleccionamos solo los campos públicos
     const result = await db.query(query);
     return result.rows;
-  }
+  },
 
-  
+  /**
+   * Genera un código de acceso de 5 caracteres mezclando letras y números.
+   * @returns {string} Código generado.
+   */
+  generateAccessCode: () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  },
+
+  /**
+   * Guarda el código de acceso para un negocio.
+   * @param {number} idUsuario - ID del usuario (negocio).
+   * @returns {Promise<object>} El negocio actualizado.
+   */
+  saveAccessCode: async (idUsuario) => {
+    const code = Negocio.generateAccessCode();
+    const query = `
+      UPDATE negocios
+      SET codigo_acceso = $1, actualizado_en = NOW()
+      WHERE id_usuario = $2
+      RETURNING id_usuario, nombre_negocio, rubro, codigo_acceso
+    `;
+    const result = await db.query(query, [code, idUsuario]);
+    if (result.rows.length === 0) {
+      throw new Error('Negocio no encontrado.');
+    }
+    return result.rows[0];
+  },
+
+  /**
+   * Actualiza códigos de acceso para todos los negocios.
+   * @returns {Promise<string>} Mensaje de confirmación.
+   */
+  updateAllAccessCodes: async () => {
+    const negocios = await db.query('SELECT id_usuario FROM negocios');
+    for (const negocio of negocios.rows) {
+      const newCode = Negocio.generateAccessCode();
+      await db.query(
+        'UPDATE negocios SET codigo_acceso = $1, actualizado_en = NOW() WHERE id_usuario = $2',
+        [newCode, negocio.id_usuario]
+      );
+    }
+    return 'Códigos de acceso actualizados correctamente';
+  }
 
 };
 
