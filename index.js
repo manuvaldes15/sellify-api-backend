@@ -43,7 +43,10 @@ const promocionRoutes = require('./routes/promocion.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // frontend origin
+  credentials: true               // permite enviar cookies/autenticación
+}));
 app.use(express.json());
 
 // --- 5. USA LAS RUTAS (Sin cambios) ---
