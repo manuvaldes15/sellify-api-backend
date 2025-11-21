@@ -196,7 +196,7 @@ const NegocioController = {
       const { code } = req.body; // código enviado por el cliente
 
       const query = 'SELECT codigo_acceso FROM negocios WHERE id = $1';
-      const result = await db.query(query, [id]);
+      const result = await Negocio;
 
       if (result.rows.length === 0) {
         return res.status(404).json({ success: false, message: 'Negocio no encontrado' });
