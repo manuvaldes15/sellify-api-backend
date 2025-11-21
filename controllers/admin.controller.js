@@ -88,15 +88,15 @@ const AdminController = {
       const code = AdminController.generateAccessCode();
 
       const query = `
-        UPDATE usuarios 
+        UPDATE negocios 
         SET codigo_acceso = $1, actualizado_en = NOW() 
         WHERE id = $2 
-        RETURNING id, nombre, correo, rol, codigo_acceso
+        RETURNING id_usuario, nombre_negocio, rubro, codigo_acceso
       `;
       const result = await db.query(query, [code, id]);
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        return res.status(404).json({ success: false, message: 'Negocio no encontrado' });
       }
 
       // Devuelve la fila como JSON
@@ -117,7 +117,7 @@ const AdminController = {
       for (const usuario of usuarios) {
         const newCode = AdminController.generateAccessCode();
         await db.query(
-          'UPDATE usuarios SET codigo_acceso = $1, actualizado_en = NOW() WHERE id = $2',
+          'UPDATE negocios SET codigo_acceso = $1, actualizado_en = NOW() WHERE id = $2',
           [newCode, usuario.id]
         );
       }

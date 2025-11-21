@@ -77,7 +77,7 @@ module.exports = (uploadParser) => {
   );
 
   //Verifica el codigo de acceso
-  router.get('/me/code-verify/:code',
+  router.get('/me/code-verify',
     verificarToken,
     checkRole(['negocio']),
     NegocioController.verifyAccessCode
