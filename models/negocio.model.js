@@ -219,6 +219,20 @@ const Negocio = {
   },
 
   /**
+   * Obtiene el código de acceso de un negocio por su ID de usuario.
+   * @param {number} idUsuario - ID del usuario (negocio).
+   * @returns {Promise<string>} El código de acceso.
+   */
+  getAccessCode: async (idUsuario) => {
+    const query = 'SELECT codigo_acceso FROM negocios WHERE id_usuario = $1';
+    const result = await db.query(query, [idUsuario]);
+    if (result.rows.length === 0) {
+      throw new Error('Negocio no encontrado');
+    }
+    return result.rows[0].codigo_acceso;
+  },
+
+  /**
    * Verifica si el código de acceso coincide con el del negocio.
    * @param {number} idUsuario - ID del usuario (negocio).
    * @param {string} code - Código a verificar.

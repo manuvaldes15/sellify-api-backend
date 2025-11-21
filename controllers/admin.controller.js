@@ -77,16 +77,15 @@ const AdminController = {
     try {
       const { id } = req.params;
 
-      const result = await Negocio.saveAccessCode(id);
+      const negocio = await Negocio.saveAccessCode(id);
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Negocio no encontrado' });
-      }
-
-      // Devuelve la fila como JSON
-      return res.json({ success: true, negocio: result.rows[0] });
+      // Devuelve el negocio actualizado como JSON
+      return res.json({ success: true, negocio });
     } catch (error) {
       console.error(error);
+      if (error.message === 'Negocio no encontrado.') {
+        return res.status(404).json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   },

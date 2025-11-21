@@ -192,17 +192,10 @@ const NegocioController = {
    */
   verifyAccessCode: async (req, res) => {
     try {
-      const { id } = req.usuario.id; // id desde el token
+      const id = req.usuario.id; // id desde el token
       const { code } = req.body; // código enviado por el cliente
 
-      const query = 'SELECT codigo_acceso FROM negocios WHERE id = $1';
-      const result = await Negocio;
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Negocio no encontrado' });
-      }
-
-      const storedCode = result.rows[0].codigo_acceso;
+      const storedCode = await Negocio.getAccessCode(id);
 
       if (storedCode === code) {
         return res.json({ success: true, message: 'Código verificado correctamente' });
@@ -211,6 +204,9 @@ const NegocioController = {
       }
     } catch (error) {
       console.error(error);
+      if (error.message === 'Negocio no encontrado') {
+        return res.status(404).json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   }
